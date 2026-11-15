@@ -24,6 +24,19 @@
   color: #201b19;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .dish-showcase.has-scroll-reveal::after {
+    content: '';
+    display: block;
+    height: clamp(194px, 31svh, 280px);
+  }
+
+  .dish-showcase.has-scroll-reveal .dish-inner {
+    position: sticky;
+    top: min(0px, calc(100svh - var(--dish-inner-height, 100svh) - 16px));
+  }
+}
+
 .dish-inner {
   width: min(100% - 10vw, 1420px);
   margin: auto;
@@ -79,6 +92,13 @@
 .dish-showcase .bene-description { display: block; margin-top: 16px; }
 .dish-showcase .bene-actions { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 13px 18px; }
 .dish-showcase .burger-stage, .dish-showcase .trio-experience { height: var(--showcase-stage); min-height: 0; }
+.dish-showcase .burger-fallback {
+  inset: 50% auto auto 50%;
+  width: min(94%, 590px, calc((var(--showcase-stage) - 40px) * 1.06383));
+  height: auto;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 7px 6px #29110a30);
+}
 .dish-showcase .burger-ring { width: min(88%, calc(var(--showcase-stage) - 16px)); }
 .dish-showcase .burger-disc { width: min(76%, calc(var(--showcase-stage) - 35px)); }
 .dish-showcase .tb-stage { height: calc(100% - 62px); }
