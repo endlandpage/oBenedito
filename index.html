@@ -305,27 +305,7 @@ html{width:100%;overflow-x:clip}body{width:100%;max-width:none;min-width:0;overf
 <section class="location-map" aria-labelledby="map-heading"><div class="map-heading"><div><span class="sec-marker">NO CORAÇÃO DE ANTONINA</span><h3 id="map-heading">SEU PRÓXIMO ENCONTRO É AQUI.</h3></div><a class="btn btn-red" href="https://www.google.com/maps/dir/?api=1&destination=O%20Benedito%20Gastro%20Pub%2C%20Rua%20Dr%20Carlos%20Gomes%20da%20Costa%20192%2C%20Antonina%20PR" target="_blank" rel="noopener noreferrer">TRAÇAR MINHA ROTA <span>↗</span></a></div><div class="map-preview"><iframe src="https://maps.google.com/maps?q=O%20Benedito%20Gastro%20Pub%2C%20Rua%20Dr%20Carlos%20Gomes%20da%20Costa%20192%2C%20Antonina%20PR&amp;z=17&amp;t=m&amp;output=embed&amp;hl=pt-BR" title="Mapa dos arredores do O Benedito Gastro Pub, no centro de Antonina" loading="lazy" referrerpolicy="no-referrer-when-downgrade" tabindex="-1" aria-hidden="true"></iframe><a class="map-route-overlay" href="https://www.google.com/maps/dir/?api=1&destination=O%20Benedito%20Gastro%20Pub%2C%20Rua%20Dr%20Carlos%20Gomes%20da%20Costa%20192%2C%20Antonina%20PR" target="_blank" rel="noopener noreferrer" aria-label="Abrir rota até O Benedito no Google Maps"><span>ABRIR ROTA NO GOOGLE MAPS ↗</span></a></div><p class="map-address">Rua Dr. Carlos Gomes da Costa, 192 · Centro · Antonina, PR</p></section></main><footer class="footer"><div class="footer-upper"><a class="brand footer-brand" href="#inicio"><span class="brand-bullet">✹</span><strong>BENE<br><span>DITO</span></strong><small>GASTRO PUB</small></a><div class="footer-nav"><a href="#conceito">A CASA</a><a href="#mais-pedidos">MAIS PEDIDOS</a><a href="#galeria">GALERIA</a><a href="https://obenedito.grandchef.com.br" target="_blank" rel="noopener noreferrer">CARDÁPIO ↗</a><a href="https://www.instagram.com/obeneditogastropub/" target="_blank" rel="noopener noreferrer">INSTAGRAM ↗</a></div></div><div class="footer-big">BENE<span>✳</span>DITO</div><div class="footer-bottom"><span>© <span id="year"></span> O BENEDITO · GASTRO PUB</span><a href="#inicio">VOLTAR AO TOPO ↑</a></div><div style="background:#111;text-align:center;padding:0 20px 28px"><a href="#admin" style="color:#aaa;font:11px Arial,sans-serif">Área administrativa</a></div></footer>
 <dialog id="lightbox" aria-label="Visualização ampliada de fotografia"><button id="close-lightbox" aria-label="Fechar galeria">✕</button><div class="lightbox-content"><img alt="" id="lightbox-photo"><p id="lightbox-title"></p><div class="lightbox-controls"><button id="prev-photo" aria-label="Foto anterior">←</button><span id="gallery-count"></span><button id="next-photo" aria-label="Próxima foto">→</button></div></div></dialog>
 
-<script>
-(() => {
-const $ = q => document.querySelector(q);
-const $$ = q => Array.from(document.querySelectorAll(q));
-const menuButton=$('#menu-toggle'), nav=$('#nav');
-menuButton.addEventListener('click',()=>{const open=nav.classList.toggle('open');menuButton.setAttribute('aria-expanded',String(open));menuButton.setAttribute('aria-label',open?'Fechar menu':'Abrir menu')});
-nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{nav.classList.remove('open');menuButton.setAttribute('aria-expanded','false');menuButton.setAttribute('aria-label','Abrir menu')}));
-$('#year').textContent=new Date().getFullYear();
-const filters=$$('.filters button'),tiles=$$('.gallery-tile');
-let current=tiles.slice(),index=0,opener=null;
-filters.forEach(button=>button.addEventListener('click',()=>{filters.forEach(b=>{b.classList.toggle('selected',b===button);b.setAttribute('aria-pressed',String(b===button))});const cat=button.dataset.filter;current=tiles.filter(t=>cat==='todos'||t.dataset.category===cat);tiles.forEach(t=>t.hidden=!current.includes(t));$('#gallery-grid').classList.toggle('filtered',cat!=='todos')}));
-const dialog=$('#lightbox'),img=$('#lightbox-photo');
-function show(n){if(!current.length)return;index=(n+current.length)%current.length;const tile=current[index];img.src=tile.dataset.full;img.alt=tile.querySelector('img').alt;$('#lightbox-title').textContent=tile.dataset.label;$('#gallery-count').textContent=`${index+1} / ${current.length}`;}
-tiles.forEach(tile=>tile.addEventListener('click',()=>{opener=tile;show(current.indexOf(tile));dialog.showModal()}));
-$('#close-lightbox').addEventListener('click',()=>dialog.close());
-$('#prev-photo').addEventListener('click',()=>show(index-1));$('#next-photo').addEventListener('click',()=>show(index+1));
-dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close()});dialog.addEventListener('close',()=>opener?.focus());
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){nav.classList.remove('open');menuButton.setAttribute('aria-expanded','false')}if(dialog.open){if(e.key==='ArrowLeft')show(index-1);if(e.key==='ArrowRight')show(index+1)}});
-
-})();
-</script>
+<script src="site-ui.js"></script>
 <script src="hamburgueres.js" defer></script>
 <script src="vitrine.js" defer></script>
 
@@ -419,6 +399,9 @@ body.bene-admin-open{overflow:hidden}
 <dialog id="gallery-preview" class="preview"><div class="modal-head row between"><div><div class="eyebrow" style="color:#ed101c;margin-bottom:10px">O BENEDITO / GALERIA</div><h2>UM POUCO DO NOSSO MUNDO.</h2></div><button class="close" data-close aria-label="Fechar prévia" style="color:white">×</button></div><div class="modal-body"><p>Prévia do rascunho. O site publicado continua igual.</p><div class="cards" id="preview-grid"></div></div></dialog>
 <dialog id="confirm"><div class="modal-head"><h2 id="confirm-title"></h2></div><div class="modal-body"><p id="confirm-message"></p></div><div class="modal-footer"><button class="btn" id="confirm-no">Cancelar</button><button class="btn primary" id="confirm-yes">Confirmar</button></div></dialog><div class="toast" id="toast" role="status" hidden></div>
 <div id="seed-data" hidden>[{"id":"bene-1","src":"assets/bene-cheddar.webp","title":"Bene Cheddar","caption":"","alt":"Bene Cheddar","category":"comida","visible":true,"position":0},{"id":"bene-2","src":"assets/drinks-coloridos.webp","title":"Drinks para compartilhar","caption":"","alt":"Drinks para compartilhar","category":"drinks","visible":true,"position":1},{"id":"bene-3","src":"assets/carne-de-onca.webp","title":"Carne de Onça","caption":"","alt":"Carne de Onça","category":"comida","visible":true,"position":2},{"id":"bene-4","src":"assets/drink-corona.webp","title":"Drink com Corona","caption":"","alt":"Drink com Corona","category":"drinks","visible":true,"position":3},{"id":"bene-5","src":"assets/sobremesa.webp","title":"Sobremesa de chocolate e morango","caption":"","alt":"Sobremesa de chocolate e morango","category":"sobremesa","visible":true,"position":4},{"id":"bene-6","src":"assets/drink-morango.webp","title":"Drinks na mesa","caption":"","alt":"Drinks na mesa","category":"drinks","visible":true,"position":5},{"id":"bene-7","src":"assets/sabores-trio.webp","title":"Trio do Bene","caption":"","alt":"Trio do Bene","category":"comida","visible":true,"position":6},{"id":"bene-8","src":"assets/drink-cream.webp","title":"Drink cremoso","caption":"","alt":"Drink cremoso","category":"drinks","visible":true,"position":7},{"id":"bene-9","src":"assets/promo-fys.webp","title":"Criativo da marca","caption":"","alt":"Criativo da marca","category":"identidade","visible":true,"position":8},{"id":"bene-10","src":"assets/galeria-0600.webp","title":"Hambúrguer no salão","alt":"Hambúrguer com cheddar e alface diante do letreiro iluminado do Benedito","caption":"","category":"comida","visible":true,"position":9},{"id":"bene-11","src":"assets/galeria-0889.webp","title":"Hambúrguer duplo com bacon","alt":"Hambúrguer duplo com queijo e bacon servido no papel da casa","caption":"","category":"comida","visible":true,"position":10},{"id":"bene-12","src":"assets/galeria-0599.webp","title":"Brioche com cheddar","alt":"Detalhe de um hambúrguer com cheddar no pão brioche","caption":"","category":"comida","visible":true,"position":11}]</div></template>
+<script src="backend-config.js"></script>
+<script src="admin-api.js"></script>
+<script src="admin-panel.js"></script>
 <script>
 (function(){
  const shell=document.getElementById('bene-admin-shell');
@@ -428,50 +411,7 @@ body.bene-admin-open{overflow:hidden}
   if(mounted)return;
   const root=shell.attachShadow({mode:'open'});
   root.append(template.content.cloneNode(true));
-  const scopedDocument={
-   getElementById:id=>root.getElementById(id),
-   createElement:tag=>document.createElement(tag),
-   querySelectorAll:selector=>root.querySelectorAll(selector)
-  };
-  (function(document){
-
-'use strict';
-const $=id=>document.getElementById(id);
-const categories={comida:'Comida',drinks:'Drinks',sobremesa:'Sobremesas',ambiente:'Ambiente',identidade:'Identidade'};
-const seed=JSON.parse($('seed-data').textContent);
-// Future integration boundary: replace this local draft repository with an authenticated API.
-// Never use this UI as authorization. Remote writes must verify an admin role server-side.
-const draftRepository={key:'benedito.gallery.demo.v1',load(){try{const d=JSON.parse(localStorage.getItem(this.key));if(d?.version!==1||!Array.isArray(d.photos))return null;return seed.map(s=>{const p=d.photos.find(p=>p.id===s.id);return p?{...s,title:String(p.title||s.title).slice(0,70),caption:String(p.caption||'').slice(0,240),alt:String(p.alt||s.alt).slice(0,300),category:categories[p.category]?p.category:s.category,visible:p.visible!==false,position:Number.isFinite(p.position)?p.position:s.position,deleted:p.deleted===true}:s}).filter(p=>!p.deleted).sort((a,b)=>a.position-b.position)}catch{return null}},save(photos){const all=seed.map(s=>{const p=photos.find(p=>p.id===s.id);return p?{id:p.id,title:p.title,caption:p.caption,alt:p.alt,category:p.category,visible:p.visible,position:p.position}:{id:s.id,deleted:true}});localStorage.setItem(this.key,JSON.stringify({version:1,photos:all}))}};
-let photos=draftRepository.load()??structuredClone(seed),filter='all',dirty=false,editing=null,toastTimer,objectUrls=[];
-function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,4000)}
-function markDirty(){dirty=true;$('save').disabled=false;$('save-state').textContent='Rascunho alterado'}
-function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n}
-function action(text,label,fn){const b=el('button','btn',text);b.type='button';b.setAttribute('aria-label',label);b.onclick=fn;return b}
-function render(){
- $('total').textContent=photos.length;$('visible-count').textContent=photos.filter(p=>p.visible).length;$('category-count').textContent=new Set(photos.map(p=>p.category)).size;
- $('tabs').replaceChildren();for(const [key,label]of Object.entries({all:'Todas',...categories})){const b=action(label,'Filtrar: '+label,()=>{filter=key;render()});b.className='tab';b.setAttribute('aria-pressed',String(filter===key));$('tabs').append(b)}
- const q=$('search').value.trim().toLocaleLowerCase('pt-BR');const items=photos.filter(p=>(filter==='all'||p.category===filter)&&[p.title,p.caption].join(' ').toLocaleLowerCase('pt-BR').includes(q));$('results').textContent=items.length+' de '+photos.length+' fotos';$('empty').hidden=items.length!==0;$('cards').replaceChildren();
- for(const p of items){const card=el('article','card'+(p.visible?'':' off'));const media=el('div','card-media');const img=el('img');img.src=p.src;img.alt=p.alt;img.loading='lazy';media.append(img,el('span','badge',categories[p.category]));const body=el('div','card-body');body.append(el('h3','',p.title),el('p','',p.caption||'Sem legenda'));const foot=el('div','card-footer');const edit=action('Editar','Editar '+p.title,()=>openEdit(p.id));const moves=el('div','move');const index=photos.indexOf(p);for(const [delta,label]of [[-1,'↑'],[1,'↓']]){const b=action(label,(delta<0?'Mover para cima: ':'Mover para baixo: ')+p.title,()=>move(p.id,delta));b.disabled=index+delta<0||index+delta>=photos.length;moves.append(b)}foot.append(edit,el('span','badge'+(p.visible?' green':''),p.visible?'Visível':'Oculta'),moves);body.append(foot);card.append(media,body);$('cards').append(card)}
-}
-function move(id,delta){const i=photos.findIndex(p=>p.id===id);if(i+delta<0||i+delta>=photos.length)return;[photos[i],photos[i+delta]]=[photos[i+delta],photos[i]];photos.forEach((p,i)=>p.position=i);markDirty();render();toast('Ordem atualizada no rascunho.')}
-function openEdit(id){editing=id;const p=photos.find(p=>p.id===id);$('edit-img').src=p.src;$('title').value=p.title;$('caption').value=p.caption;$('alt').value=p.alt;$('category').value=p.category;$('visible').checked=p.visible;$('edit').showModal()}
-function confirmAction(title,message,fn){$('confirm-title').textContent=title;$('confirm-message').textContent=message;$('confirm-yes').onclick=()=>{$('confirm').close();fn()};$('confirm').showModal()}
-$('confirm-no').onclick=()=>$('confirm').close();
-for(const [value,label]of Object.entries(categories)){const option=el('option','',label);option.value=value;$('category').append(option)}
-$('explore').onclick=()=>{$('login').hidden=true;$('app').hidden=false;render();$('search').focus()};
-$('exit').onclick=()=>{const leave=()=>{photos=draftRepository.load()??structuredClone(seed);dirty=false;$('save').disabled=true;$('save-state').textContent='Sem alterações';$('app').hidden=true;$('login').hidden=false;$('explore').focus()};if(dirty)confirmAction('Sair da demonstração?','As alterações ainda não salvas serão descartadas.',leave);else leave()};
-$('edit-form').onsubmit=e=>{e.preventDefault();const title=$('title').value.trim(),alt=$('alt').value.trim();if(!title||!alt){toast('Preencha o nome e a descrição da foto.');return}const p=photos.find(p=>p.id===editing);Object.assign(p,{title,caption:$('caption').value.trim(),alt,category:$('category').value,visible:$('visible').checked});markDirty();render();$('edit').close();toast('Foto atualizada no rascunho.')};
-$('remove').onclick=()=>confirmAction('Excluir esta foto?','A foto será removida somente desta demonstração. Você pode restaurar a galeria inicial.',()=>{photos=photos.filter(p=>p.id!==editing);markDirty();render();$('edit').close();toast('Foto removida do rascunho.')});
-$('save').onclick=()=>{try{photos.forEach((p,i)=>p.position=i);draftRepository.save(photos);dirty=false;$('save').disabled=true;$('save-state').textContent='Salvo neste navegador';toast('Rascunho salvo neste navegador. O site não foi alterado.')}catch{toast('Não foi possível salvar. Verifique se o navegador permite armazenamento local.')}};
-$('reset').onclick=()=>confirmAction('Restaurar a demonstração?','Isso remove os ajustes locais e restaura a galeria original.',()=>{try{localStorage.removeItem(draftRepository.key)}catch{}photos=structuredClone(seed);filter='all';$('search').value='';markDirty();render();toast('Demonstração restaurada. Salve para manter este rascunho.')});
-$('search').oninput=render;$('clear').onclick=()=>{filter='all';$('search').value='';render()};
-$('preview').onclick=()=>{$('preview-grid').replaceChildren();const shown=photos.filter(p=>p.visible);for(const p of shown){const f=el('figure');const img=el('img');img.src=p.src;img.alt=p.alt;const caption=el('figcaption','',p.title+(p.caption?' · '+p.caption:''));f.append(img,caption);$('preview-grid').append(f)}if(!shown.length)$('preview-grid').append(el('p','','Nenhuma foto visível no rascunho.'));$('gallery-preview').showModal()};
-function clearQueue(){objectUrls.forEach(u=>URL.revokeObjectURL(u));objectUrls=[];$('queue').replaceChildren();$('files').value='';$('file-feedback').textContent=''}
-$('add').onclick=()=>{clearQueue();$('upload').showModal()};$('upload').addEventListener('close',clearQueue);
-$('files').onchange=()=>{objectUrls.forEach(u=>URL.revokeObjectURL(u));objectUrls=[];$('queue').replaceChildren();const files=[...$('files').files],valid=files.slice(0,10).filter(f=>['image/jpeg','image/png','image/webp'].includes(f.type)&&f.size<=15*1024*1024);$('file-feedback').textContent=valid.length+' foto(s) selecionada(s) para prévia. Nada foi enviado.'+(valid.length!==files.length?' Alguns arquivos foram ignorados por tipo, tamanho ou limite de 10 fotos.':'');for(const file of valid){const url=URL.createObjectURL(file);objectUrls.push(url);const f=el('figure');const img=el('img');img.src=url;img.alt='Prévia de '+file.name;f.append(img,el('figcaption','',file.name+' · '+(file.size/1024/1024).toFixed(1)+' MB'));$('queue').append(f)}};
-document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
-
-  })(scopedDocument);
+  window.BeneAdmin.mount(root);
   root.querySelectorAll('[data-return-site]').forEach(link=>link.addEventListener('click',e=>{
    e.preventDefault(); location.hash='';
   }));

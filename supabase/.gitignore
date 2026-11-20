@@ -1,0 +1,4 @@
+.npm-cache/
+.codec-test/
+.temp/
+.env*

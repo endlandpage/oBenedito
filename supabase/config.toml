@@ -1,0 +1,13 @@
+project_id = "o-benedito-test"
+
+[functions.bene-admin]
+# The handler verifies the exact JWT with Auth, checks auth.sessions and the
+# active admin UUID on every call. Legacy gateway verification is disabled to
+# support current asymmetric Supabase signing keys.
+verify_jwt = false
+
+[auth]
+enable_signup = false
+
+[auth.email]
+enable_signup = false

@@ -1,0 +1,35 @@
+# Galeria O Benedito — Supabase de teste
+
+Projeto: `hzjfcsedzqjwwkvutwvm`. Estes arquivos são preparação local; aplicação de migrations, deploy e configuração remota dependem da revisão e da autorização do coordenador. Não usam nem alteram Render.
+
+## Contrato
+
+- Público: `GET /rest/v1/bene_gallery_public?select=*&order=position.asc`, com chave publicável no cabeçalho `apikey`. Retorna somente fotos visíveis, campos `id,src,title,caption,alt,category,visible,position`. Os 12 seeds mantêm `assets/*.webp`.
+- Administração: `/functions/v1/bene-admin`, `Authorization: Bearer <access_token>` e `apikey` publicável. `GET` retorna `{photos,revision}`; cada `src` de upload é uma URL privada assinada por cinco minutos, renovada ao carregar a lista.
+- Salvar: `POST application/json`, `{action:"save",revision,photos:[{id,title,caption,alt,category,visible,position}]}`. A ordem do array prevalece; IDs ausentes são excluídos. `src`, caminhos e posição recebida são ignorados. Resposta `{photos,revision}`; conflito retorna `409` e exige recarregar o rascunho.
+- Upload: `POST multipart/form-data` com exatamente um campo `file`; inclui imediatamente uma foto **oculta**, retorna `{photos,revision}`. O frontend deve bloquear upload quando houver rascunho não salvo, ou pedir para salvar/descartar antes. Upload é operação persistida, não uma prévia local.
+- Erros: `{error:"mensagem"}`, HTTP 400/401/403/409/415/429/500/503. Uma resposta de erro após o commit pode representar erro de leitura/assinatura da lista; recarregar antes de repetir. Nunca repetir um upload automaticamente.
+
+## Controles
+
+JWT verificado por `auth.getUser(token)` em toda chamada; só então extrai `session_id`. Todos os RPCs verificam UUID ativo em `bene_gallery_admins` e existência da sessão em `auth.sessions` (incluindo `not_after`). Logout local no Auth remove a sessão correspondente; token JWT antigo deixa de autorizar o endpoint mesmo antes de expirar. A autorização é revalidada na transação de escrita, inclusive após processamento de imagem.
+
+Sessão do frontend fica somente em memória. Não cadastrar administrador pelo frontend nem por metadados de usuário. Após criar usuário de teste pelo dashboard, o operador deve inserir explicitamente seu UUID com `active=true` na allowlist pelo SQL Editor. Não há administrador inicial. Desativar novos cadastros públicos no dashboard Auth e verificar a configuração efetiva; `config.toml` local não muda projeto remoto por si só.
+
+RLS habilitado em todas as tabelas. Anon/authenticated não têm INSERT/UPDATE/DELETE ou EXECUTE nos RPCs, inclusive para administradores. A view usa `security_invoker`; SELECT direto da tabela limita colunas e linhas visíveis. Estado, allowlist, rate counters e caminhos privados são fechados. RPCs `SECURITY DEFINER` fixam `search_path=''`, nomes qualificados e execução somente `service_role`. Não colocar service role no cliente, arquivos ou notas.
+
+Storage: `bene-gallery-private` é privado e contém apenas WebP reencodado; `bene-gallery-public` recebe somente cópias sanitizadas para fotos publicadas. Policies restritivas bloqueiam escrita direta dos clientes em ambos e leitura privada. Ao ocultar/excluir, SQL retira a referência pública e a função tenta remover o objeto antigo. **Uma foto já publicada não é confidencial**: cache, download e URLs antigas podem sobreviver. Falha de limpeza é registrada sem caminhos ou tokens e exige limpeza posterior pelo operador. Queda entre upload de objeto e commit também pode deixar órfãos; não apagar objetos por prefixo sem conferir referências atuais.
+
+Limites: 4 MB, JPEG/PNG/WebP estático, até 4096 px por lado e 4 megapixels; saída WebP sem metadados, maior lado de até 1600 px, qualidade 82. Valida assinatura e dimensões antes de alocar pixels; o decoder recebe formato explícito. Sem SVG/GIF/HTML. Cabeçalho limitado de fato durante leitura do stream, incluindo multipart de no máximo 4 MB + 16 KB. Um processamento por isolate; rate limit persistente por usuário: 60 leituras/min, 12 saves/min, 6 uploads/min, 120 uploads/dia; até 100 fotos. Sem prometer proteção global contra DDoS ou uso ilimitado do plano Free.
+
+Publicação exige objetos prontos antes do commit SQL. Cada publicação usa caminho imutável aleatório, prevenindo sobrescrita/limpeza concorrente de uma publicação mais recente. Metadados, exclusão e revisão são atômicos no Postgres; Storage não participa da transação SQL. Objetos pendentes não aparecem na view pública, mas o bucket público é público para quem possuir a URL.
+
+## Configuração e validação pendentes
+
+Segredos da função: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` são fornecidos pelo ambiente Supabase. O padrão deste projeto de teste permite apenas `http://127.0.0.1:8766` e `http://localhost:8766`; para substituir, definir `ALLOWED_ORIGINS` como lista exata. Para testes locais apenas, `ALLOW_LOCALHOST=true` aceita HTTP em localhost, 127.0.0.1 e [::1] com porta; não aceita subdomínios ou hosts externos. Sem `Origin` o endpoint continua exigindo autenticação — CORS não é autorização. Em produção remover loopback e configurar somente a origem real. Gateway JWT legacy desabilitado com `verify_jwt=false`; a função realiza verificação Auth e de sessão completa internamente.
+
+Testes locais: `node --experimental-vm-modules --test supabase/tests/validation.test.mjs`. Cobrem validação de metadados, limites de bytes, cabeçalhos reais dos 12 seeds e parse de TypeScript. Para executar o mesmo codec WASM localmente: `npm install --prefix ./supabase/.codec-test --cache ./supabase/.npm-cache --ignore-scripts --no-audit --no-fund @imagemagick/magick-wasm@0.0.46`, seguido de `node --test supabase/tests/codec.test.mjs`. Esse teste reencodifica os 12 seeds com o fluxo real; não substitui o teste do bundle/Deno Edge ou os testes integrados.
+
+Após revisão, aplicar as duas migrations, fazer deploy da função com dependências npm/WASM e configuração de origens, criar usuário/allowlist sem gravar senha, então executar: acesso sem JWT; usuário fora da allowlist; usuário desativado com JWT ainda válido; JWT após logout; tentativas diretas de escrita em tabelas/RPCs/Storage com anon e usuário admin; uploads inválidos e imagem válida; confirmação de WebP sem metadados; upload oculto não listado publicamente; save/ordem/ocultar/excluir; conflito de revisão; persistência em dois contextos independentes; assinatura expirada; limites e falhas de rede. Usar SQL/HTTP reais para conferir RLS e erros, não apenas status do navegador. Esses testes integrados permanecem pendentes até configurar o ambiente.
+
+Fontes oficiais consultadas: [manipulação de imagens](https://supabase.com/docs/guides/functions/examples/image-manipulation), [sessões e revogação](https://supabase.com/docs/guides/auth/sessions), [código magick-wasm](https://github.com/dlemstra/magick-wasm). Versões npm fixadas no código; validar bundle e WASM no deploy, sem carregar conteúdo remoto do usuário.

@@ -1,0 +1,13 @@
+-- Seed audited local assets. New uploads can only be created by the Edge Function.
+insert into public.bene_gallery_photos(id,seed_src,title,caption,alt,category,visible,position) values ('bene-1','assets/bene-cheddar.webp','Bene Cheddar','','Bene Cheddar','comida',true,0);
+insert into public.bene_gallery_photos(id,seed_src,title,caption,alt,category,visible,position) values ('bene-2','assets/drinks-coloridos.webp','Drinks para compartilhar','','Drinks para compartilhar','drinks',true,1);
+insert into public.bene_gallery_photos(id,seed_src,title,caption,alt,category,visible,position) values ('bene-3','assets/carne-de-onca.webp','Carne de Onça','','Carne de Onça','comida',true,2);
+insert into public.bene_gallery_photos(id,seed_src,title,caption,alt,category,visible,position) values ('bene-4','assets/drink-corona.webp','Drink com Corona','','Drink com Corona','drinks',true,3);
+insert into public.bene_gallery_photos(id,seed_src,title,caption,alt,category,visible,position) values ('bene-5','assets/sobremesa.webp','Sobremesa de chocolate e morango','','Sobremesa de chocolate e morango','sobremesa',true,4);
+insert into public.bene_gallery_photos(id,seed_src,title,caption,alt,category,visible,position) values ('bene-6','assets/drink-morango.webp','Drinks na mesa','','Drinks na mesa','drinks',true,5);
+insert into public.bene_gallery_photos(id,seed_src,title,caption,alt,category,visible,position) values ('bene-7','assets/sabores-trio.webp','Trio do Bene','','Trio do Bene','comida',true,6);
+insert into public.bene_gallery_photos(id,seed_src,title,caption,alt,category,visible,position) values ('bene-8','assets/drink-cream.webp','Drink cremoso','','Drink cremoso','drinks',true,7);
+insert into public.bene_gallery_photos(id,seed_src,title,caption,alt,category,visible,position) values ('bene-9','assets/promo-fys.webp','Criativo da marca','','Criativo da marca','identidade',true,8);
+insert into public.bene_gallery_photos(id,seed_src,title,caption,alt,category,visible,position) values ('bene-10','assets/galeria-0600.webp','Hambúrguer no salão','','Hambúrguer com cheddar e alface diante do letreiro iluminado do Benedito','comida',true,9);
+insert into public.bene_gallery_photos(id,seed_src,title,caption,alt,category,visible,position) values ('bene-11','assets/galeria-0889.webp','Hambúrguer duplo com bacon','','Hambúrguer duplo com queijo e bacon servido no papel da casa','comida',true,10);
+insert into public.bene_gallery_photos(id,seed_src,title,caption,alt,category,visible,position) values ('bene-12','assets/galeria-0599.webp','Brioche com cheddar','','Detalhe de um hambúrguer com cheddar no pão brioche','comida',true,11);
