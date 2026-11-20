@@ -6,7 +6,7 @@
   const dishes = [
     { id: 'bene-cheddar', name: 'Bene Cheddar', thumb: 'assets/vitrine-cheddar.webp' },
     { id: 'hamburguer-o-benedito', name: 'O Benedito', thumb: 'assets/vitrine-benedito.webp' },
-    { id: 'smash-duplo', name: 'Smash Duplo', thumb: 'assets/vitrine-smash-duplo.webp' },
+    { id: 'smash-duplo', name: 'Smash Duplo', thumb: 'assets/vitrine-smash-duplo.svg' },
     { id: 'menu', name: 'Trio Bene', thumb: 'assets/vitrine-trio.webp' },
   ].map(dish => ({ ...dish, panel: document.getElementById(dish.id) }));
 
