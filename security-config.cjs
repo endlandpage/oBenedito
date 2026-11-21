@@ -8,7 +8,7 @@ const csp = [
   "img-src 'self' data: blob: https://hzjfcsedzqjwwkvutwvm.supabase.co",
   "font-src 'self'", "media-src 'self' blob:",
   "connect-src 'self' https://hzjfcsedzqjwwkvutwvm.supabase.co",
-  "frame-src https://maps.google.com", "worker-src 'none'",
+  "frame-src https://maps.google.com https://www.google.com", "worker-src 'none'",
   "manifest-src 'self'", 'upgrade-insecure-requests',
 ].join('; ');
 module.exports = {
