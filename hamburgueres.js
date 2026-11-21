@@ -183,7 +183,7 @@ function mountBurger({ id, name, description, ingredients, sprite }) {
   else if (!navigator.connection?.saveData) window.addEventListener('load', () => loadPictures('low'), { once: true });
 }
 
-mountBurger({"id":"smash-duplo","name":"Smash Duplo","description":"dois smash de 80 g de blend de costela, cebola empanada, bacon, queijo, barbecue e pão; maionese da casa à parte","sprite":{"width":1024,"height":1536,"src":"assets/smash-duplo-camadas.webp"},"ingredients":[{"start":0,"end":210,"assembled":-0.44,"turn":-3},{"start":210,"end":554,"assembled":-0.25,"turn":3},{"start":554,"end":765,"assembled":-0.08,"turn":-3},{"start":765,"end":975,"assembled":0.025,"turn":3},{"start":975,"end":1125,"assembled":0.13,"turn":-3},{"start":1125,"end":1290,"assembled":0.23,"turn":3},{"start":1290,"end":1536,"assembled":0.35,"turn":-3}]});
+mountBurger({"id":"smash-duplo","name":"Bene Rodeio","description":"dois smash de 80 g de blend de costela, cebola empanada, bacon, queijo, barbecue e pão; maionese da casa à parte","sprite":{"width":1024,"height":1536,"src":"assets/smash-duplo-camadas.webp"},"ingredients":[{"start":0,"end":210,"assembled":-0.44,"turn":-3},{"start":210,"end":554,"assembled":-0.25,"turn":3},{"start":554,"end":765,"assembled":-0.08,"turn":-3},{"start":765,"end":975,"assembled":0.025,"turn":3},{"start":975,"end":1125,"assembled":0.13,"turn":-3},{"start":1125,"end":1290,"assembled":0.23,"turn":3},{"start":1290,"end":1536,"assembled":0.35,"turn":-3}]});
 mountBurger(cheddar);
 mountBurger(benedito);
 })();

@@ -320,3 +320,7 @@
 @media (prefers-reduced-motion: reduce) {
   .float-label, .dish-picker img { transition: none; }
 }
+
+/* O alimento ganha destaque sobre o fundo natural da vitrine. */
+.burger-stage .burger-disc, .burger-stage .burger-ring { display: none; }
+.burger-stage .burger-shadow { background: rgba(64,44,29,.12); filter: blur(18px); opacity: calc(.65 - var(--open)*.5); }
