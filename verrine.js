@@ -21,9 +21,9 @@
    viewer.setAttribute('alt','Modelo 3D do Verrine O Benedito. Arraste para girar ou use as setas do teclado.');
    viewer.setAttribute('camera-controls','');viewer.setAttribute('disable-pan','');
    viewer.setAttribute('touch-action','pan-y');viewer.setAttribute('interaction-prompt','none');
-   viewer.setAttribute('camera-orbit','180deg 75deg 105%');viewer.setAttribute('field-of-view','30deg');
+   viewer.setAttribute('camera-orbit','0deg 78deg 105%');viewer.setAttribute('field-of-view','22deg');
    viewer.setAttribute('min-camera-orbit','auto 15deg 80%');viewer.setAttribute('max-camera-orbit','auto 160deg 180%');
-   viewer.setAttribute('shadow-intensity','.35');viewer.setAttribute('exposure','1');
+   viewer.setAttribute('environment-image','assets/verrine-estudio.hdr');viewer.setAttribute('shadow-intensity','.085');viewer.setAttribute('exposure','1');
    viewer.setAttribute('rotation-per-second','18deg');viewer.setAttribute('auto-rotate-delay','1000');
    const ready=new Promise((resolve,reject)=>{viewer.addEventListener('load',resolve,{once:true});viewer.addEventListener('error',()=>reject(Error('Não foi possível abrir o modelo 3D')),{once:true})});
    viewer.src='assets/verrine-360.glb';stage.prepend(viewer);await ready;
@@ -33,7 +33,7 @@
   return pending;
  }
  play.addEventListener('click',()=>{playing=!playing;sync()});
- reset.addEventListener('click',()=>{viewer.cameraOrbit='180deg 75deg 105%';viewer.jumpCameraToGoal();playing=false;sync()});
+ reset.addEventListener('click',()=>{viewer.cameraOrbit='0deg 78deg 105%';viewer.jumpCameraToGoal();playing=false;sync()});
  panel.addEventListener('dishchange',()=>{if(!panel.hidden)load();sync()});
  document.addEventListener('visibilitychange',sync);
  reduced.addEventListener('change',()=>{if(reduced.matches)playing=false;sync()});

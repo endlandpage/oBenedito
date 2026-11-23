@@ -29,7 +29,8 @@ function copyAssets(relative) {
       copyAssets(path.join(relative,name));
     }
   } else {
-    if (!/\.(?:webp|png|jpe?g|svg|avif|gif|ico|ttf|woff2?|mp4|webm|glb)$/i.test(relative)) throw Error('Unapproved asset type: '+relative);
+    const verrineLighting = relative === path.join('assets', 'verrine-estudio.hdr');
+    if (!verrineLighting && !/\.(?:webp|png|jpe?g|svg|avif|gif|ico|ttf|woff2?|mp4|webm|glb)$/i.test(relative)) throw Error('Unapproved asset type: '+relative);
     fs.copyFileSync(source,path.join(output,relative));
   }
 }
