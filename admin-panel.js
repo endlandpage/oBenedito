@@ -133,8 +133,8 @@
     const centerCrop = () => ({ x:50, y:50, zoom:1 });
     const clamp = v => Math.min(100,Math.max(0,v));
     function cropRect(bitmap,crop) {
-      const scale = Math.max(1200/bitmap.width,900/bitmap.height)*crop.zoom;
-      const width = 1200/scale, height = 900/scale;
+      const scale = Math.max(1200/bitmap.width,1500/bitmap.height)*crop.zoom;
+      const width = 1200/scale, height = 1500/scale;
       return { x:(bitmap.width-width)*crop.x/100, y:(bitmap.height-height)*crop.y/100, width, height };
     }
     function drawCrop(canvas,bitmap,crop) {
@@ -158,7 +158,7 @@
       if (item.blob) return new File([item.blob],item.file.name.replace(/\.[^.]+$/,'')+'.webp',{type:item.blob.type});
       const bitmap = await createImageBitmap(item.file);
       try {
-        const canvas = document.createElement('canvas'); canvas.width=1200; canvas.height=900;
+        const canvas = document.createElement('canvas'); canvas.width=1200; canvas.height=1500;
         drawCrop(canvas,bitmap,item.crop);
         const blob = await cropBlob(canvas);
         return new File([blob],item.file.name.replace(/\.[^.]+$/,'')+'.webp',{type:blob.type});
@@ -174,11 +174,11 @@
     }
     async function openCrop(item) {
       cropItem=item; cropDraft={...item.crop}; const token=++cropToken;
-      $('crop-help').textContent='Arraste a foto ou use os controles. Esta é a área que aparecerá no cartão da galeria, no formato 4:3.';
+      $('crop-help').textContent='Arraste a foto ou use os controles. Esta é a área que aparecerá no cartão da galeria, no formato 4:5.';
       $('crop-note').textContent=item.photoId ? 'O arquivo original será preservado. A mudança só vai ao site depois de aplicar ao rascunho e salvar a galeria.' : 'Somente a imagem enviada será recortada. O arquivo original no seu aparelho permanece intacto.';
       $('crop-apply').disabled=true; $('crop-reset').disabled=true;
       for (const id of ['crop-zoom','crop-x','crop-y']) $(id).disabled=true;
-      cropCanvas.getContext('2d')?.clearRect(0,0,1200,900);
+      cropCanvas.getContext('2d')?.clearRect(0,0,1200,1500);
       $('crop-status').textContent='Abrindo foto…'; $('crop').showModal();
       try {
         let file=item.file;
@@ -279,7 +279,7 @@
       $('app').querySelector('header .badge').textContent = 'TESTES MIRALTO';
       $('app').querySelector('.notice>span').textContent = 'As alterações salvas são compartilhadas no ambiente de testes. Fotos publicadas ficam acessíveis por link.';
       $('save').textContent = 'Salvar galeria'; $('reset').textContent = 'Recarregar dados';
-      $('upload').querySelector('.notice').textContent = 'Confira o recorte 4:3 de cada foto. Use “Ajustar enquadramento” para mover ou ampliar. O recorte será enviado, e as fotos entram ocultas até você salvar a visibilidade.';
+      $('upload').querySelector('.notice').textContent = 'Confira o recorte 4:5 de cada foto. Use “Ajustar enquadramento” para mover ou ampliar. O recorte será enviado, e as fotos entram ocultas até você salvar a visibilidade.';
       send.textContent = 'Enviar fotos'; $('upload').querySelector('.modal-footer [data-close]').textContent = 'Cancelar';
       window.addEventListener('bene:session-ended',() => { root.querySelectorAll('dialog[open]').forEach(d => d.close()); showLogin(); });
       let lastRenewal = 0, renewing = false;
