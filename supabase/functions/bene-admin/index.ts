@@ -29,13 +29,13 @@ async function rpc(name:string,args:Record<string,unknown>){
   }return data;
 }
 async function checked(result:PromiseLike<{error:unknown}>) {if((await result).error)throw new HttpError(503,'Armazenamento temporariamente indisponível.');}
-type Row={id:string;seed_src:string|null;private_path:string|null;public_path:string|null;title:string;caption:string;alt:string;category:string;visible:boolean;position:number};
+type Row={id:string;seed_src:string|null;private_path:string|null;public_path:string|null;title:string;caption:string;alt:string;category:string;visible:boolean;position:number;crop:{x:number;y:number;zoom:number}|null};
 type Snapshot={photos:Row[];revision:number};
 async function present(snapshot:Snapshot){
   const photos=await Promise.all(snapshot.photos.map(async p=>{
     let src=p.seed_src;
     if(!src){const {data,error}=await db.storage.from(PRIVATE).createSignedUrl(p.private_path!,300);if(error||!data)throw new HttpError(503,'Não foi possível carregar as imagens.');src=data.signedUrl;}
-    return {id:p.id,src,title:p.title,caption:p.caption,alt:p.alt,category:p.category,visible:p.visible,position:p.position};
+    return {id:p.id,src,title:p.title,caption:p.caption,alt:p.alt,category:p.category,visible:p.visible,position:p.position,crop:p.crop??null};
   }));return {photos,revision:snapshot.revision};
 }
 async function removePaths(bucket:string,paths:string[]){

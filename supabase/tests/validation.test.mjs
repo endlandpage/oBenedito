@@ -3,7 +3,20 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {stripTypeScriptTypes} from 'node:module';
 import vm from 'node:vm';
-import {saveInput,rasterHeader,boundedBody,MAX_FILE} from '../functions/bene-admin/validation.mjs';
+import {saveInput,rasterHeader,boundedBody,MAX_FILE,photoCrop} from '../functions/bene-admin/validation.mjs';
+
+test('crop validates inclusive bounds and nullable framing without accepting extra fields',()=>{
+  for(const crop of [null,{x:0,y:100,zoom:1},{x:100,y:0,zoom:3},{x:12.25,y:81.5,zoom:1.25}])assert.deepEqual(photoCrop(crop),crop);
+  for(const crop of [undefined,{},[],true,'crop',2,{x:50,y:50},{x:50,y:50,zoom:1,extra:0},JSON.parse('{"x":50,"y":50,"zoom":1,"__proto__":{}}'),{x:'50',y:50,zoom:1},{x:50,y:null,zoom:1},{x:NaN,y:50,zoom:1},{x:50,y:Infinity,zoom:1},{x:-1,y:50,zoom:1},{x:101,y:50,zoom:1},{x:50,y:-1,zoom:1},{x:50,y:101,zoom:1},{x:50,y:50,zoom:.99},{x:50,y:50,zoom:3.01}])assert.throws(()=>photoCrop(crop));
+});
+test('save preserves omitted crop, carries null reset and clones validated metadata',()=>{
+  const crop={x:23,y:67,zoom:1.8};
+  const out=saveInput({action:'save',revision:7,photos:[{...photo,crop}]}).photos[0];
+  assert.deepEqual(out.crop,crop);assert.notEqual(out.crop,crop);assert.equal(out.id,photo.id);assert.equal(out.position,0);assert.equal(out.visible,true);
+  assert(!Object.hasOwn(saveInput({action:'save',revision:7,photos:[photo]}).photos[0],'crop'));
+  assert.equal(saveInput({action:'save',revision:7,photos:[{...photo,crop:null}]}).photos[0].crop,null);
+  assert.throws(()=>saveInput({action:'save',revision:7,photos:[{...photo,crop:undefined}]}));
+});
 
 const photo={id:'bene-1',title:'Foto',caption:'',alt:'Uma foto',category:'comida',visible:true,position:0};
 test('metadata is bounded, duplicate IDs rejected, client src is ignored',()=>{

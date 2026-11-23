@@ -69,8 +69,8 @@
     },
     async load() { return gallery(await request('/functions/v1/bene-admin', {}, true)); },
     async save(revision, photos) {
-      const fields = photos.map(({ id, title, caption, alt, category, visible, position }) =>
-        ({ id, title, caption, alt, category, visible, position }));
+      const fields = photos.map(({ id, title, caption, alt, category, visible, position, crop }) =>
+        ({ id, title, caption, alt, category, visible, position, ...(crop!==undefined?{crop}:{} ) }));
       return gallery(await request('/functions/v1/bene-admin', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'save', revision, photos: fields }),

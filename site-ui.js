@@ -43,15 +43,20 @@
   window.addEventListener('bene:gallery-unavailable',() => galleryStatus('Não foi possível carregar a galeria agora. ',true));
   window.addEventListener('bene:gallery-data',e => {
     const photos = e.detail, labels = {todos:'TUDO',comida:'COMIDA',drinks:'DRINKS',sobremesa:'SOBREMESAS',ambiente:'AMBIENTE',identidade:'IDENTIDADE'};
-    if (dialog.open) dialog.close(); grid.replaceChildren();
+    if (dialog.open) dialog.close(); grid.replaceChildren(); grid.classList.add('is-managed');
     photos.forEach((p,i) => {
-      const button = document.createElement('button'); button.className = 'gallery-tile'+(i === 0 ? ' large' : '');
+      const button = document.createElement('button'); button.className = 'gallery-tile';
       button.dataset.category = p.category; button.dataset.full = p.src; button.dataset.label = p.title+(p.caption ? ' · '+p.caption : '');
       const photo = document.createElement('img'); photo.src = p.src; photo.alt = p.alt; photo.loading = 'lazy';
+      const photoFrame=document.createElement('span');photoFrame.className='gallery-photo-frame';photoFrame.append(photo);
+      const c=p.crop;
+      if(c && ['x','y','zoom'].every(k=>typeof c[k]==='number'&&Number.isFinite(c[k])) && c.x>=0&&c.x<=100&&c.y>=0&&c.y<=100&&c.zoom>=1&&c.zoom<=3){
+        photo.style.setProperty('--photo-zoom',c.zoom);photo.style.setProperty('--photo-x',c.x+'%');photo.style.setProperty('--photo-y',c.y+'%');
+      }
       const number = document.createElement('span'); number.className = 'g-index'; number.textContent = `${String(i+1).padStart(2,'0')} / ${labels[p.category] || ''}`;
       const title = document.createElement('strong'); title.textContent = p.title;
       const expand = document.createElement('span'); expand.className = 'g-expand'; expand.textContent = '↗'; expand.setAttribute('aria-hidden','true');
-      button.append(photo,number,title,expand); grid.append(button);
+      button.append(photoFrame,number,title,expand); grid.append(button);
     });
     filters.replaceChildren();
     for (const [value,label] of Object.entries(labels)) {

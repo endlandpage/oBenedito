@@ -2,6 +2,13 @@ export const MAX_FILE = 4 * 1024 * 1024;
 export const MAX_PHOTOS = 100;
 const categories = new Set(['comida', 'drinks', 'sobremesa', 'ambiente', 'identidade']);
 export class InputError extends Error {}
+export function photoCrop(crop) {
+  if (crop === null) return null;
+  if (!crop || typeof crop !== 'object' || Array.isArray(crop) || Object.keys(crop).length !== 3 || !['x','y','zoom'].every(key => Object.hasOwn(crop,key))) throw new InputError('Enquadramento inválido.');
+  const {x,y,zoom}=crop;
+  if (![x,y,zoom].every(value => typeof value === 'number' && Number.isFinite(value)) || x<0 || x>100 || y<0 || y>100 || zoom<1 || zoom>3) throw new InputError('Enquadramento inválido.');
+  return {x,y,zoom};
+}
 export function photoMetadata(p, position) {
   if (!p || typeof p !== 'object' || typeof p.id !== 'string' || !/^(bene-[1-9][0-9]?|[0-9a-f-]{36})$/.test(p.id)) throw new InputError('Foto inválida.');
   const out = {id:p.id, position};
@@ -11,6 +18,7 @@ export function photoMetadata(p, position) {
     if (required && !out[key]) throw new InputError('Preencha nome e descrição.');
   }
   if (!categories.has(p.category) || typeof p.visible !== 'boolean') throw new InputError('Categoria ou visibilidade inválida.');
+  if (Object.hasOwn(p,'crop')) out.crop=photoCrop(p.crop);
   return {...out,category:p.category,visible:p.visible};
 }
 export function saveInput(body) {
