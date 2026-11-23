@@ -310,17 +310,13 @@ html{width:100%;overflow-x:clip}body{width:100%;max-width:none;min-width:0;overf
       <p class="bene-description">Sorvete de <strong>creme</strong> e banana flambada com especiarias, servidos em uma taça de vidro. Um final doce, do jeito do Bene.</p>
       <div class="bene-actions">
         <a class="bene-order" href="https://obenedito.grandchef.com.br" target="_blank" rel="noopener noreferrer">VER CARDÁPIO <span aria-hidden="true">↗</span></a>
-        <button class="bene-toggle" type="button" aria-pressed="false" aria-controls="verrine-visual"><span class="bene-toggle-text">Ver ingredientes</span></button>
+        <button class="bene-toggle verrine-play" type="button" aria-pressed="false" aria-controls="verrine-visual"><span class="bene-toggle-text">Girar taça</span></button>
+        <button class="bene-toggle verrine-reset" type="button" aria-controls="verrine-visual">Voltar à posição inicial</button>
       </div>
     </div>
-    <figure id="verrine-visual" class="verrine-stage" role="img" aria-label="Verrine O Benedito montado em taça de vidro.">
-      <img class="verrine-assembled" data-src="assets/verrine-montado.webp" alt="" width="640" height="960" decoding="async">
-      <div class="verrine-piece verrine-glass" aria-hidden="true"><img data-src="assets/verrine-componentes.webp" alt="" width="1200" height="800"></div>
-      <div class="verrine-piece verrine-banana" aria-hidden="true"><img data-src="assets/verrine-componentes.webp" alt="" width="1200" height="800"></div>
-      <div class="verrine-piece verrine-cream" aria-hidden="true"><img data-src="assets/verrine-componentes.webp" alt="" width="1200" height="800"></div>
-      <span class="verrine-label" aria-hidden="true">Taça de vidro</span>
-      <span class="verrine-label" aria-hidden="true">Banana flambada<br>com especiarias</span>
-      <span class="verrine-label" aria-hidden="true">Sorvete de creme</span>
+    <figure id="verrine-visual" class="verrine-stage" aria-label="Verrine O Benedito em 3D interativo">
+      <img class="verrine-assembled" data-src="assets/verrine-montado.webp" alt="Verrine O Benedito: sorvete de creme e banana flambada em taça de vidro" width="640" height="960" decoding="async">
+      <p class="verrine-hint">Arraste para ver por todos os lados</p>
     </figure>
   </div><span class="bene-sr-only" role="status"></span></div>
 </section>

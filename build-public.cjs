@@ -17,7 +17,7 @@ function checkedSource(file) {
   if (fs.lstatSync(source).isSymbolicLink()) throw Error('Symlinks are not public assets');
   return source;
 }
-for (const file of ['site-ui.js','hamburgueres.js','verrine.js','vitrine.js','delivery.js','backend-config.js','admin-api.js','admin-panel.js','revisao-local.css']) {
+for (const file of ['site-ui.js','hamburgueres.js','verrine.js','model-viewer.min.js','model-viewer.css','vitrine.js','delivery.js','backend-config.js','admin-api.js','admin-panel.js','revisao-local.css']) {
   fs.copyFileSync(checkedSource(file),path.join(output,file));
 }
 function copyAssets(relative) {
@@ -29,7 +29,7 @@ function copyAssets(relative) {
       copyAssets(path.join(relative,name));
     }
   } else {
-    if (!/\.(?:webp|png|jpe?g|svg|avif|gif|ico|ttf|woff2?|mp4|webm)$/i.test(relative)) throw Error('Unapproved asset type: '+relative);
+    if (!/\.(?:webp|png|jpe?g|svg|avif|gif|ico|ttf|woff2?|mp4|webm|glb)$/i.test(relative)) throw Error('Unapproved asset type: '+relative);
     fs.copyFileSync(source,path.join(output,relative));
   }
 }

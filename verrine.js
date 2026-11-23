@@ -1,56 +1,42 @@
 (() => {
-  'use strict';
-  const panel = document.getElementById('verrine-o-benedito');
-  if (!panel) return;
-  const stage = panel.querySelector('.verrine-stage');
-  const assembled = panel.querySelector('.verrine-assembled');
-  const pieces = [...panel.querySelectorAll('.verrine-piece')];
-  const labels = [...panel.querySelectorAll('.verrine-label')];
-  const button = panel.querySelector('.bene-toggle');
-  const status = panel.querySelector('[role="status"]');
-  const motion = matchMedia('(prefers-reduced-motion: reduce)');
-  let target = 0, current = 0, frame = 0, ready = false, pending;
-  function draw() {
-    frame = 0;
-    if (panel.hidden || !ready) return;
-    current = motion.matches ? target : current + (target-current)*.13;
-    if (Math.abs(current-target)<.001) current=target;
-    const h=stage.clientHeight;
-    assembled.style.opacity=String(Math.max(0,1-current*3));
-    assembled.style.transform=`translate(-50%,-50%) scale(${1-current*.06})`;
-    const positions=[.21,-.04,-.34];
-    pieces.forEach((piece,i)=>{
-      piece.style.opacity=String(Math.min(1,current*2));
-      piece.style.transform=`translate(-50%,-50%) translate3d(${(i===1?-.035:i===2?.025:0)*h*current}px,${h*(positions[i]*current+.01*(1-current))}px,0) scale(${.85+.15*current})`;
-      labels[i].style.opacity=String(Math.max(0,(current-.55)/.45));
-      labels[i].style.transform=`translateY(-50%) translateY(${positions[i]*h}px)`;
-    });
-    if (current!==target) schedule();
-  }
-  function schedule(){if(!frame&&!panel.hidden)frame=requestAnimationFrame(draw)}
-  function setOpen(value){
-    target=Math.max(0,Math.min(1,value));
-    const open=target>.5;
-    button.setAttribute('aria-pressed',String(open));
-    button.querySelector('.bene-toggle-text').textContent=open?'Montar a taça':'Ver ingredientes';
-    stage.setAttribute('aria-label',open?'Verrine em camadas: sorvete de creme, banana flambada com especiarias e taça de vidro.':'Verrine O Benedito montado em taça de vidro.');
-    schedule();
-  }
-  function load(){
-    if(pending)return pending;
-    pending=Promise.all([...stage.querySelectorAll('img')].map(im=>{
-      if(im.dataset.src){im.src=im.dataset.src;delete im.dataset.src}
-      return im.decode();
-    })).then(()=>{ready=true;button.disabled=false;stage.classList.add('verrine-ready');schedule()}).catch(()=>{
-      status.textContent='Não foi possível carregar a animação. A sobremesa continua disponível no cardápio.';
-      pending=null;
-    });return pending;
-  }
-  button.disabled=true;
-  button.addEventListener('click',()=>{setOpen(target>.5?0:1);status.textContent=target>.5?'Sorvete de creme e banana flambada com especiarias.':'Taça montada.'});
-  panel.addEventListener('dishscroll',e=>setOpen(e.detail));
-  panel.addEventListener('dishchange',()=>{if(panel.hidden){cancelAnimationFrame(frame);frame=0}else{load();schedule()}});
-  new ResizeObserver(schedule).observe(stage);
-  motion.addEventListener('change',()=>{current=target;schedule()});
-  if(!panel.hidden)load();
+ 'use strict';
+ const panel=document.getElementById('verrine-o-benedito');if(!panel)return;
+ const stage=panel.querySelector('.verrine-stage'),poster=stage.querySelector('img');
+ const play=panel.querySelector('.verrine-play'),reset=panel.querySelector('.verrine-reset');
+ const text=play.querySelector('span'),status=panel.querySelector('[role="status"]');
+ const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+ let viewer,pending,loaded=false,visible=true,playing=!reduced.matches;
+ play.disabled=reset.disabled=true;
+ function sync(){
+  if(viewer)viewer.autoRotate=loaded&&playing&&visible&&!panel.hidden&&!document.hidden;
+  play.setAttribute('aria-pressed',String(playing));text.textContent=playing?'Pausar giro':'Girar taça';
+ }
+ async function load(){
+  if(pending)return pending;
+  if(poster.dataset.src){poster.src=poster.dataset.src;delete poster.dataset.src}
+  status.textContent='Carregando taça 3D…';stage.setAttribute('aria-busy','true');
+  pending=(async()=>{
+   await import('./model-viewer.min.js');await customElements.whenDefined('model-viewer');
+   viewer=document.createElement('model-viewer');
+   viewer.setAttribute('alt','Modelo 3D do Verrine O Benedito. Arraste para girar ou use as setas do teclado.');
+   viewer.setAttribute('camera-controls','');viewer.setAttribute('disable-pan','');
+   viewer.setAttribute('touch-action','pan-y');viewer.setAttribute('interaction-prompt','none');
+   viewer.setAttribute('camera-orbit','180deg 75deg 105%');viewer.setAttribute('field-of-view','30deg');
+   viewer.setAttribute('min-camera-orbit','auto 15deg 80%');viewer.setAttribute('max-camera-orbit','auto 160deg 180%');
+   viewer.setAttribute('shadow-intensity','.35');viewer.setAttribute('exposure','1');
+   viewer.setAttribute('rotation-per-second','18deg');viewer.setAttribute('auto-rotate-delay','1000');
+   const ready=new Promise((resolve,reject)=>{viewer.addEventListener('load',resolve,{once:true});viewer.addEventListener('error',()=>reject(Error('Não foi possível abrir o modelo 3D')),{once:true})});
+   viewer.src='assets/verrine-360.glb';stage.prepend(viewer);await ready;
+   loaded=true;stage.classList.add('verrine-ready');poster.hidden=true;stage.removeAttribute('aria-busy');
+   play.disabled=reset.disabled=false;status.textContent='Taça 3D pronta. Arraste para girar.';sync();
+  })().catch(error=>{console.error(error);viewer?.remove();viewer=null;poster.hidden=false;stage.removeAttribute('aria-busy');status.textContent='A visualização 3D não carregou. A foto da sobremesa continua disponível.';pending=null});
+  return pending;
+ }
+ play.addEventListener('click',()=>{playing=!playing;sync()});
+ reset.addEventListener('click',()=>{viewer.cameraOrbit='180deg 75deg 105%';viewer.jumpCameraToGoal();playing=false;sync()});
+ panel.addEventListener('dishchange',()=>{if(!panel.hidden)load();sync()});
+ document.addEventListener('visibilitychange',sync);
+ reduced.addEventListener('change',()=>{if(reduced.matches)playing=false;sync()});
+ new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;sync()}).observe(stage);
+ if(!panel.hidden)load();
 })();

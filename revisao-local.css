@@ -325,23 +325,16 @@
 .burger-stage .burger-disc, .burger-stage .burger-ring { display: none; }
 .burger-stage .burger-shadow { background: rgba(64,44,29,.12); filter: blur(18px); opacity: calc(.65 - var(--open)*.5); }
 
-/* O Verrine revela os ingredientes sem aumentar a altura da vitrine. */
+/* Verrine em malha 3D completa, carregado ao selecionar. */
 .verrine-stage { position:relative; grid-area:visual; margin:0; height:var(--showcase-stage); min-width:0; container-type:size; }
 .verrine-assembled { position:absolute; left:50%; top:50%; width:auto; height:96%; max-width:100%; object-fit:contain; transform:translate(-50%,-50%); }
-.verrine-piece { position:absolute; left:50%; top:50%; overflow:hidden; opacity:0; pointer-events:none; }
-.verrine-piece img { position:absolute; width:300%; max-width:none; height:auto; left:0; top:0; }
-.verrine-glass { width:38cqh; aspect-ratio:512/760; }
-.verrine-glass img { transform:translate(0,-13.67%); }
-.verrine-banana { width:43cqh; aspect-ratio:512/430; }
-.verrine-banana img { transform:translate(-33.333333%,-29.3%); }
-.verrine-cream { width:34cqh; aspect-ratio:512/460; }
-.verrine-cream img { transform:translate(-66.666667%,-26.36%); }
-.verrine-label { position:absolute; top:50%; width:100px; font:700 11px/1.35 var(--sans); opacity:0; pointer-events:none; }
-.verrine-label:nth-of-type(1), .verrine-label:nth-of-type(3) { left:0; }
-.verrine-label:nth-of-type(2) { right:0; text-align:right; }
+.verrine-stage model-viewer { display:block; width:100%; height:calc(100% - 24px); background:transparent; --poster-color:transparent; touch-action:pan-y; }
+.verrine-stage .verrine-assembled[hidden] { display:none; }
+.verrine-hint { position:absolute; bottom:0; width:100%; margin:0; text-align:center; font:500 10px/1.4 var(--sans); color:#6e6056; pointer-events:none; }
+.verrine-reset { font-size:10px; }
 #verrine-o-benedito .bene-toggle:disabled { opacity:.55; cursor:wait; }
 @media(max-width:760px) {
- .verrine-label { width:82px; font-size:10px; }
+
  .dish-picker { flex-wrap:wrap; }
  #verrine-o-benedito .dish-title { font-size:clamp(38px,10vw,65px)!important; }
 }
