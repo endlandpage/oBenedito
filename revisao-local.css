@@ -330,6 +330,7 @@
 
 /* O alimento ganha destaque sobre o fundo natural da vitrine. */
 .burger-stage .burger-disc, .burger-stage .burger-ring { display: none; }
+.burger-spark img { width:1em; height:1em; object-fit:contain; }
 .burger-stage .burger-shadow { background: rgba(64,44,29,.12); filter: blur(18px); opacity: calc(.65 - var(--open)*.5); }
 
 /* Verrine em malha 3D completa, carregado ao selecionar. */
