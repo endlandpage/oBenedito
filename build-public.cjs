@@ -17,7 +17,7 @@ function checkedSource(file) {
   if (fs.lstatSync(source).isSymbolicLink()) throw Error('Symlinks are not public assets');
   return source;
 }
-for (const file of ['site-ui.js','hamburgueres.js','vitrine.js','delivery.js','backend-config.js','admin-api.js','admin-panel.js','revisao-local.css']) {
+for (const file of ['site-ui.js','hamburgueres.js','verrine.js','vitrine.js','delivery.js','backend-config.js','admin-api.js','admin-panel.js','revisao-local.css']) {
   fs.copyFileSync(checkedSource(file),path.join(output,file));
 }
 function copyAssets(relative) {

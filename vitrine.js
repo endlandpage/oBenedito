@@ -8,6 +8,7 @@
     { id: 'hamburguer-o-benedito', name: 'O Benedito', thumb: 'assets/vitrine-benedito.webp' },
     { id: 'smash-duplo', name: 'Bene Rodeio', thumb: 'assets/vitrine-smash-duplo.svg' },
     { id: 'menu', name: 'Trio Bene', thumb: 'assets/vitrine-trio.webp' },
+    { id: 'verrine-o-benedito', name: 'Verrine O Benedito', thumb: 'assets/vitrine-verrine.webp' },
   ].map(dish => ({ ...dish, panel: document.getElementById(dish.id) }));
 
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
