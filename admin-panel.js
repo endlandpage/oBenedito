@@ -245,8 +245,8 @@
     $('upload').addEventListener('close',clearQueue); $('upload').addEventListener('cancel',e => { if (busy) e.preventDefault(); });
     $('files').onchange = () => {
       objectUrls.forEach(u => URL.revokeObjectURL(u)); objectUrls = []; $('queue').replaceChildren();
-      const all = [...$('files').files]; queue = all.slice(0,10).filter(f => ['image/jpeg','image/png','image/webp'].includes(f.type) && f.size > 0 && f.size <= 15*1024*1024);
-      $('file-feedback').textContent = queue.length+' foto(s) selecionada(s).'+(queue.length !== all.length ? ' Alguns arquivos foram ignorados por tipo, tamanho ou limite de 10 fotos.' : '');
+      const all = [...$('files').files]; queue = all.slice(0,6).filter(f => ['image/jpeg','image/png','image/webp'].includes(f.type) && f.size > 0 && f.size <= 15*1024*1024);
+      $('file-feedback').textContent = queue.length+' foto(s) selecionada(s).'+(queue.length !== all.length ? ' Alguns arquivos foram ignorados por tipo, tamanho ou limite de 6 fotos.' : '');
       queue=queue.map(file=>{const url=URL.createObjectURL(file);objectUrls.push(url);return {file,url,crop:centerCrop(),blob:null};});
       renderQueue();
       send.disabled = !api || !queue.length;

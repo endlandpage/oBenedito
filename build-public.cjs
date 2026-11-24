@@ -17,7 +17,7 @@ function checkedSource(file) {
   if (fs.lstatSync(source).isSymbolicLink()) throw Error('Symlinks are not public assets');
   return source;
 }
-for (const file of ['site-ui.js','hamburgueres.js','verrine.js','model-viewer.min.js','model-viewer.css','vitrine.js','delivery.js','backend-config.js','admin-api.js','admin-panel.js','revisao-local.css']) {
+for (const file of ['site-ui.js','hamburgueres.js','verrine.js','model-viewer.min.js','model-viewer.css','vitrine.js','delivery.js','backend-config.js','admin-api.js','admin-panel.js','revisao-local.css','cookie-preferences.js','legal.css','robots.txt','sitemap.xml']) {
   fs.copyFileSync(checkedSource(file),path.join(output,file));
 }
 function copyAssets(relative) {
@@ -35,19 +35,26 @@ function copyAssets(relative) {
   }
 }
 copyAssets('assets');
-let html = fs.readFileSync(checkedSource('index.html'),'utf8').replace(/\r\n?/g,'\n');
 let scripts = 0, styles = 0;
-html = html.replace(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi,(original,attrs,body) => {
-  if (/\bsrc\s*=/i.test(attrs) || /\btype\s*=\s*["']application\/ld\+json/i.test(attrs)) return original;
-  const file = `runtime-inline-${++scripts}.js`;
-  fs.writeFileSync(path.join(output,file),body);
-  return `<script${attrs} src="${file}"></script>`;
-});
-html = html.replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gi,(_original,css) => {
-  const file = `runtime-style-${++styles}.css`;
-  fs.writeFileSync(path.join(output,file),css);
-  return `<link rel="stylesheet" href="${file}">`;
-});
-if (/<script\b(?![^>]*\bsrc=)[^>]*>[\s\S]*?<\/script>/i.test(html)) throw Error('Unexpected inline executable script');
-fs.writeFileSync(path.join(output,'index.html'),html);
+function transformPage(file) {
+  let html = fs.readFileSync(checkedSource(file),'utf8').replace(/\r\n?/g,'\n');
+  html = html.replace(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi,(original,attrs,body) => {
+    if (/\bsrc\s*=/i.test(attrs)) return original;
+    if (/\btype\s*=\s*["']application\/ld\+json/i.test(attrs)) { JSON.parse(body); return original; }
+    const external = `runtime-inline-${++scripts}.js`;
+    fs.writeFileSync(path.join(output,external),body);
+    return `<script${attrs} src="${external}"></script>`;
+  });
+  html = html.replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gi,(_original,css) => {
+    const external = `runtime-style-${++styles}.css`;
+    fs.writeFileSync(path.join(output,external),css);
+    return `<link rel="stylesheet" href="${external}">`;
+  });
+  html.replace(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi,(_original,attrs) => {
+    if (!/\bsrc\s*=/i.test(attrs) && !/\btype\s*=\s*["']application\/ld\+json/i.test(attrs)) throw Error('Unexpected inline executable script in '+file);
+    return _original;
+  });
+  fs.writeFileSync(path.join(output,file),html);
+}
+for (const file of ['index.html','privacidade.html','termos.html','cookies.html']) transformPage(file);
 console.log(JSON.stringify({output:'dist',inlineScriptsExternalized:scripts,styleBlocksExternalized:styles,rootFiles:fs.readdirSync(output).filter(n=>n!=='assets')}));
