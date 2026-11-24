@@ -6,6 +6,9 @@
     const categories = { comida: 'Comida', drinks: 'Drinks', sobremesa: 'Sobremesas', ambiente: 'Ambiente', identidade: 'Identidade' };
     const seed = JSON.parse($('seed-data').textContent);
     const key = 'benedito.gallery.demo.v1';
+    const heroModels={'bene-cheddar':'Bene Cheddar','hamburguer-o-benedito':'O Benedito','smash-duplo':'Bene Rodeio','menu':'Trio Bene','verrine-o-benedito':'Verrine O Benedito'};
+    const defaultSettings=()=>({heroModel:'bene-cheddar',featureOneId:null,featureTwoId:null});
+    let siteSettings=defaultSettings();
     function loadDemo() {
       try {
         const d = JSON.parse(localStorage.getItem(key));
@@ -43,8 +46,20 @@
       } else { disabledControls.forEach(([n,disabled]) => n.disabled = disabled); disabledControls = []; }
     }
     function action(text, label, fn) { const b = el('button','btn',text); b.type = 'button'; b.setAttribute('aria-label',label); b.onclick = fn; return b; }
-    function accept(data) { photos = data.photos; revision = data.revision; dirty = false; mustReload = false; $('save').disabled = true; $('save-state').textContent = 'Salvo no armazenamento'; }
+    function accept(data) { photos = data.photos; revision = data.revision; siteSettings=data.settings?{...data.settings}:defaultSettings(); dirty = false; mustReload = false; $('save').disabled = true; $('save-state').textContent = 'Salvo no armazenamento'; }
+    function renderSettings(){
+      $('hero-model').replaceChildren();
+      for(const[value,label]of Object.entries(heroModels)){const option=el('option','',label);option.value=value;$('hero-model').append(option)}
+      $('hero-model').value=siteSettings.heroModel;
+      for(const[id,key,imgId,fallback]of [['feature-one','featureOneId','feature-one-preview','assets/bene-cheddar.webp'],['feature-two','featureTwoId','feature-two-preview','assets/carne-de-onca.webp']]){
+        const select=$(id);select.replaceChildren();const option=el('option','','Usar imagem original');option.value='';select.append(option);
+        for(const photo of photos.filter(p=>p.visible)){const op=el('option','',photo.title);op.value=photo.id;select.append(op)}
+        if(siteSettings[key]&&!photos.some(p=>p.id===siteSettings[key]&&p.visible))siteSettings[key]=null;
+        select.value=siteSettings[key]||'';const photo=photos.find(p=>p.id===siteSettings[key]);$(imgId).src=photo?.src||fallback;$(imgId).alt=photo?.alt||'Imagem original do destaque';framePhoto($(imgId),null);
+      }
+    }
     function render() {
+      renderSettings();
       $('total').textContent = photos.length; $('visible-count').textContent = photos.filter(p => p.visible).length;
       $('category-count').textContent = new Set(photos.map(p => p.category)).size; $('tabs').replaceChildren();
       for (const [value,label] of Object.entries({ all:'Todas', ...categories })) {
@@ -70,6 +85,8 @@
         body.append(foot); card.append(media,body); $('cards').append(card);
       }
     }
+    $('hero-model').onchange=()=>{siteSettings.heroModel=$('hero-model').value;markDirty();};
+    for(const[id,key]of [['feature-one','featureOneId'],['feature-two','featureTwoId']])$(id).onchange=()=>{siteSettings[key]=$(id).value||null;markDirty();renderSettings();};
     function openEdit(id) {
       editing = id; const p = photos.find(p => p.id === id); $('edit-img').src = p.src; $('edit-img').dataset.photo = p.id;
       editCropDraft=validCrop(p.crop);framePhoto($('edit-img'),editCropDraft);$('edit-crop-state').textContent='O enquadramento será aplicado ao salvar a galeria.';
@@ -108,7 +125,7 @@
     $('save').onclick = async () => {
       if (busy) return; if (mustReload) { toast('Recarregue os dados antes de salvar ou enviar novas fotos.'); return; } photos.forEach((p,i) => p.position = i); setBusy(true);
       try {
-        if (api) accept(await api.save(revision,photos));
+        if (api) accept(await api.save(revision,photos,siteSettings));
         else { localStorage.setItem(key,JSON.stringify({version:1,photos:seed.map(s => photos.find(p => p.id === s.id) || {id:s.id,deleted:true})})); dirty = false; }
         setBusy(false); $('save').disabled = true; $('save-state').textContent = api ? 'Salvo no armazenamento' : 'Salvo neste navegador'; render();
         toast(api ? 'Galeria salva no ambiente de testes.' : 'Rascunho salvo neste navegador. O site não foi alterado.');

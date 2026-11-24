@@ -1,7 +1,20 @@
 export const MAX_FILE = 4 * 1024 * 1024;
 export const MAX_PHOTOS = 100;
 const categories = new Set(['comida', 'drinks', 'sobremesa', 'ambiente', 'identidade']);
+export const HERO_MODELS = Object.freeze(['bene-cheddar','hamburguer-o-benedito','smash-duplo','menu','verrine-o-benedito']);
 export class InputError extends Error {}
+export function siteSettings(settings, photos) {
+  const keys=['heroModel','featureOneId','featureTwoId'];
+  if (!settings || typeof settings !== 'object' || Array.isArray(settings) || Object.keys(settings).length !== keys.length || !keys.every(key=>Object.hasOwn(settings,key))) throw new InputError('Configurações inválidas.');
+  if (!HERO_MODELS.includes(settings.heroModel)) throw new InputError('Modelo inicial inválido.');
+  const out={heroModel:settings.heroModel};
+  for (const key of keys.slice(1)) {
+    const id=settings[key];
+    if (id!==null && (typeof id!=='string' || !/^(bene-[1-9][0-9]?|[0-9a-f-]{36})$/.test(id) || !photos.some(photo=>photo.id===id && photo.visible===true))) throw new InputError('Escolha uma foto visível da galeria para o destaque.');
+    out[key]=id;
+  }
+  return out;
+}
 export function photoCrop(crop) {
   if (crop === null) return null;
   if (!crop || typeof crop !== 'object' || Array.isArray(crop) || Object.keys(crop).length !== 3 || !['x','y','zoom'].every(key => Object.hasOwn(crop,key))) throw new InputError('Enquadramento inválido.');
@@ -25,7 +38,9 @@ export function saveInput(body) {
   if (body?.action !== 'save' || !Number.isSafeInteger(body.revision) || body.revision < 0 || !Array.isArray(body.photos) || body.photos.length > MAX_PHOTOS) throw new InputError('Rascunho inválido.');
   const photos = body.photos.map(photoMetadata);
   if (new Set(photos.map(p=>p.id)).size !== photos.length) throw new InputError('Foto duplicada.');
-  return {revision:body.revision,photos};
+  const out={revision:body.revision,photos};
+  if (Object.hasOwn(body,'settings')) out.settings=siteSettings(body.settings,photos);
+  return out;
 }
 // Inspect the actual bytes BEFORE a decoder allocates its pixel buffers. The
 // decoder is then constrained to this detected raster format, never auto-detect.

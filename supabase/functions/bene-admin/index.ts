@@ -30,13 +30,14 @@ async function rpc(name:string,args:Record<string,unknown>){
 }
 async function checked(result:PromiseLike<{error:unknown}>) {if((await result).error)throw new HttpError(503,'Armazenamento temporariamente indisponível.');}
 type Row={id:string;seed_src:string|null;private_path:string|null;public_path:string|null;title:string;caption:string;alt:string;category:string;visible:boolean;position:number;crop:{x:number;y:number;zoom:number}|null};
-type Snapshot={photos:Row[];revision:number};
+type SiteSettings={heroModel:string;featureOneId:string|null;featureTwoId:string|null};
+type Snapshot={photos:Row[];revision:number;settings:SiteSettings};
 async function present(snapshot:Snapshot){
   const photos=await Promise.all(snapshot.photos.map(async p=>{
     let src=p.seed_src;
     if(!src){const {data,error}=await db.storage.from(PRIVATE).createSignedUrl(p.private_path!,300);if(error||!data)throw new HttpError(503,'Não foi possível carregar as imagens.');src=data.signedUrl;}
     return {id:p.id,src,title:p.title,caption:p.caption,alt:p.alt,category:p.category,visible:p.visible,position:p.position,crop:p.crop??null};
-  }));return {photos,revision:snapshot.revision};
+  }));return {photos,revision:snapshot.revision,settings:snapshot.settings};
 }
 async function removePaths(bucket:string,paths:string[]){
   if(!paths.length)return;
@@ -127,7 +128,7 @@ Deno.serve(async request=>{
         prepared.push({...photo,public_path:publicPath});
       }
       let after:Snapshot;
-      try{after=await rpc('bene_admin_save',{...actor,p_revision:input.revision,p_photos:prepared});}
+      try{after=await rpc('bene_admin_save',{...actor,p_revision:input.revision,p_photos:prepared,...(Object.hasOwn(input,'settings')?{p_settings:input.settings}:{})});}
       catch(e){await removePaths(PUBLIC,created);created.length=0;throw e;}
       // Once SQL commits, never compensate by removing the current objects.
       created.length=0;

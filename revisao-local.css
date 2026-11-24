@@ -347,7 +347,7 @@
  #verrine-o-benedito .dish-title { font-size:clamp(38px,10vw,65px)!important; }
 }
 /* Evolução da marca: tipografia direta, palha e vermelho da casa. */
-#conceito { background:#f7f4ed; color:#201b19; padding-block:clamp(55px,7vw,105px); }
+#conceito { background:#e9ddc9; color:#201b19; padding-block:clamp(55px,7vw,105px); }
 #conceito .concept-grid { grid-template-columns:minmax(0,1.05fr) minmax(0,.8fr); align-items:center; gap:10%; margin-top:0; }
 #conceito h2 { font-family:var(--barlow); font-size:clamp(72px,10.3vw,148px); line-height:.88; letter-spacing:-.025em; text-transform:uppercase; }
 #conceito h2 span { color:#bd0d18; }
@@ -406,3 +406,15 @@
 
 /* Símbolo vetorial da marca, sem variação de emoji entre dispositivos. */
 .bene-asterisk { display:inline-block; width:1em; height:1em; vertical-align:-.08em; flex-shrink:0; }
+
+/* Keep the story as one readable column at every showcase breakpoint. */
+.dish-showcase .bene-story { display:block; min-width:0; grid-area:intro; }
+.dish-showcase .burger-stage { grid-area:visual; }
+@media (max-width:820px) {
+  .dish-showcase .bene-grid, .dish-showcase .trio-layout { grid-template-columns:minmax(0,1fr); grid-template-areas:'intro' 'visual'; gap:0; }
+  .dish-showcase .bene-story, .dish-showcase .trio-copy { padding-top:15px; }
+  .dish-showcase .dish-title { overflow-wrap:normal; word-break:normal; }
+  .dish-showcase .burger-stage { margin-top:0; }
+}
+.iconic { background:#f7f4ed; }
+#cookie-dialog .cookie-actions .consent-button { flex:1 1 190px; }

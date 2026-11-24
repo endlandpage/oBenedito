@@ -15,6 +15,7 @@
   let active = dishes[0];
   const alternatives = dishes.slice(1);
   let entrance;
+  let userSelected=false;
   let travel = 0;
   let stickyTop = 0;
   let progress;
@@ -82,6 +83,7 @@
     button.append(picture, document.createElement('span'));
     updateTile(button, dish);
     button.addEventListener('click', () => {
+      userSelected=true;
       select(alternatives[slot]);
       if (dishes.some(item => location.hash === `#${item.id}`)) {
         history.replaceState(history.state, '', `#${active.id}`);
@@ -112,5 +114,11 @@
   }
 
   window.addEventListener('hashchange', showLinkedDish);
+  function configuredHero(payload){
+    if(userSelected||dishes.some(d=>location.hash===`#${d.id}`))return;
+    const dish=dishes.find(d=>d.id===payload?.settings?.hero_model);if(dish)select(dish,false);
+  }
+  window.addEventListener('bene:site-data',e=>configuredHero(e.detail));
+  if(window.BeneSiteData)configuredHero(window.BeneSiteData);
   showLinkedDish();
 })();

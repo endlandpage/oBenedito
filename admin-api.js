@@ -50,7 +50,7 @@
   }
   function gallery(data) {
     if (!Array.isArray(data.photos) || !Number.isInteger(data.revision)) throw new Error('Resposta inválida da galeria.');
-    return { photos: data.photos.map(safePhoto), revision: data.revision };
+    return { photos: data.photos.map(safePhoto), revision: data.revision, settings: data.settings };
   }
   window.BeneAdminAPI = Object.freeze({
     async login(email, password) {
@@ -68,12 +68,12 @@
       finally { expired(); }
     },
     async load() { return gallery(await request('/functions/v1/bene-admin', {}, true)); },
-    async save(revision, photos) {
+    async save(revision, photos, settings) {
       const fields = photos.map(({ id, title, caption, alt, category, visible, position, crop }) =>
         ({ id, title, caption, alt, category, visible, position, ...(crop!==undefined?{crop}:{} ) }));
       return gallery(await request('/functions/v1/bene-admin', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'save', revision, photos: fields }),
+        body: JSON.stringify({ action: 'save', revision, photos: fields, ...(settings?{settings}:{}) }),
       }, true));
     },
     async upload(file) {
@@ -95,6 +95,11 @@
       const form = new FormData(); form.append('file', blob, 'foto.webp');
       return gallery(await request('/functions/v1/bene-admin', { method: 'POST', body: form }, true));
     },
+    async publicSettings() {
+      const data=await request('/rest/v1/bene_site_settings_public?select=hero_model,feature_one_id,feature_two_id');
+      if(!Array.isArray(data)||data.length!==1)throw new Error('Configuração indisponível.');
+      return data[0];
+    },
     async publicPhotos() {
       const data = await request('/rest/v1/bene_gallery_public?select=*&order=position.asc');
       if (!Array.isArray(data)) throw new Error('Resposta inválida da galeria.');
@@ -106,6 +111,11 @@
     try {
       const photos = await window.BeneAdminAPI.publicPhotos();
       window.dispatchEvent(new CustomEvent('bene:gallery-data', { detail: photos }));
+      try {
+        const settings=await window.BeneAdminAPI.publicSettings();
+        const payload={settings,photos};window.BeneSiteData=payload;
+        window.dispatchEvent(new CustomEvent('bene:site-data',{detail:payload}));
+      } catch { /* Existing presentation remains available during backend rollout. */ }
     } catch { window.dispatchEvent(new Event('bene:gallery-unavailable')); }
   }
   window.addEventListener('bene:gallery-updated', refreshPublic);

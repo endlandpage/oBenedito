@@ -69,4 +69,16 @@
     tiles = [...grid.querySelectorAll('.gallery-tile')]; applyFilter();
     if (!photos.length) galleryStatus('Ainda não há fotos publicadas.');
   });
+  const featureDefaults=[...document.querySelectorAll('.iconic-cards figure')].map(figure=>({figure,img:figure.querySelector('img'),src:figure.querySelector('img').getAttribute('src'),alt:figure.querySelector('img').alt,caption:figure.querySelector('figcaption').textContent}));
+  function applySiteSettings(data){
+    const settings=data?.settings;if(!settings)return;
+    featureDefaults.forEach((entry,index)=>{
+      const id=index===0?settings.feature_one_id:settings.feature_two_id;
+      const photo=data.photos?.find(p=>p.id===id);
+      entry.img.src=photo?.src||entry.src;entry.img.alt=photo?.alt||entry.alt;
+      entry.figure.querySelector('figcaption').textContent=photo?.title||entry.caption;
+    });
+  }
+  window.addEventListener('bene:site-data',e=>applySiteSettings(e.detail));
+  if(window.BeneSiteData)applySiteSettings(window.BeneSiteData);
 })();

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {stripTypeScriptTypes} from 'node:module';
 import vm from 'node:vm';
-import {saveInput,rasterHeader,boundedBody,MAX_FILE,photoCrop} from '../functions/bene-admin/validation.mjs';
+import {saveInput,rasterHeader,boundedBody,MAX_FILE,photoCrop,HERO_MODELS} from '../functions/bene-admin/validation.mjs';
 
 test('crop validates inclusive bounds and nullable framing without accepting extra fields',()=>{
   for(const crop of [null,{x:0,y:100,zoom:1},{x:100,y:0,zoom:3},{x:12.25,y:81.5,zoom:1.25}])assert.deepEqual(photoCrop(crop),crop);
@@ -19,6 +19,19 @@ test('save preserves omitted crop, carries null reset and clones validated metad
 });
 
 const photo={id:'bene-1',title:'Foto',caption:'',alt:'Uma foto',category:'comida',visible:true,position:0};
+test('site choices allow exactly the curated hero models and visible draft photo IDs',()=>{
+  const base={action:'save',revision:0,photos:[photo]};
+  assert(!Object.hasOwn(saveInput(base),'settings'));
+  for(const heroModel of HERO_MODELS){
+    const settings={heroModel,featureOneId:'bene-1',featureTwoId:null};
+    const output=saveInput({...base,settings});
+    assert.deepEqual(output.settings,settings);assert.notEqual(output.settings,settings);
+  }
+  const good={heroModel:'bene-cheddar',featureOneId:null,featureTwoId:null};
+  for(const settings of [null,undefined,[],true,'hero',{}, {...good,heroModel:'https://evil.test/model.glb'}, {...good,heroModel:4}, {...good,extra:1}, {...good,featureOneId:undefined}, {...good,featureOneId:7}, {...good,featureOneId:'bene-2'}, {...good,featureOneId:'assets/bene-cheddar.webp'},JSON.parse('{"heroModel":"bene-cheddar","featureOneId":null,"featureTwoId":null,"__proto__":{}}')])assert.throws(()=>saveInput({...base,settings}));
+  assert.throws(()=>saveInput({...base,photos:[{...photo,visible:false}],settings:{...good,featureOneId:'bene-1'}}));
+  assert.throws(()=>saveInput({...base,photos:[],settings:{...good,featureOneId:'bene-1'}}));
+});
 test('metadata is bounded, duplicate IDs rejected, client src is ignored',()=>{
   assert.equal(saveInput({action:'save',revision:0,photos:[{...photo,src:'https://evil.test/x'}]}).photos[0].src,undefined);
   for(const p of [{...photo,title:'x'.repeat(71)},{...photo,alt:''},{...photo,category:'svg'},{...photo,visible:'true'},{...photo,title:'abc\0'}])assert.throws(()=>saveInput({action:'save',revision:0,photos:[p]}));
