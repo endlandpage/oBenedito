@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://o-benedito.onrender.com/sitemap.xml
+Sitemap: https://www.obeneditogastropub.com.br/sitemap.xml

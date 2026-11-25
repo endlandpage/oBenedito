@@ -33,14 +33,20 @@ test('Edge returns settings and forwards only explicitly validated settings to t
  assert.equal(response.status,200);assert.deepEqual(saves[1].p_settings,settings);assert.deepEqual((await response.json()).settings,settings);
  response=await handler(request({action:'save',revision:snapshot.revision,photos:snapshot.photos,settings:null}));
  assert.equal(response.status,400);assert.equal(saves.length,2);assert(authTokens.every(value=>value===token));
- for(const origin of ['https://o-benedito.onrender.com','https://o-benedito-demo-v4o6.onrender.com']){
+ for(const origin of ['https://o-benedito.onrender.com','https://o-benedito-demo-v4o6.onrender.com','https://www.obeneditogastropub.com.br','https://obeneditogastropub.com.br']){
   const preflight=await handler(new Request('https://example.test/functions/v1/bene-admin',{method:'OPTIONS',headers:{origin}}));
   assert.equal(preflight.status,204);assert.equal(preflight.headers.get('access-control-allow-origin'),origin);assert.equal(preflight.headers.get('vary'),'Origin');
   const anonymous=await handler(new Request('https://example.test/functions/v1/bene-admin',{headers:{origin}}));
   assert.equal(anonymous.status,401);assert.equal(anonymous.headers.get('access-control-allow-origin'),origin);
  }
- for(const origin of ['https://untrusted.example','https://o-benedito-demo-v4o6.onrender.com.untrusted.example','http://o-benedito-demo-v4o6.onrender.com']){
+ for(const origin of ['https://untrusted.example','https://o-benedito-demo-v4o6.onrender.com.untrusted.example','http://o-benedito-demo-v4o6.onrender.com','https://www.obeneditogastropub.com.br.untrusted.example','http://www.obeneditogastropub.com.br','https://sub.obeneditogastropub.com.br']){
   const rejected=await handler(new Request('https://example.test/functions/v1/bene-admin',{method:'OPTIONS',headers:{origin}}));
   assert.equal(rejected.status,403);assert.equal(rejected.headers.get('access-control-allow-origin'),null);
+ }
+ let configuredHandler;
+ new vm.Script(js).runInNewContext({createClient:()=>db,boundedBody,InputError,MAX_FILE,rasterHeader,saveInput,console,Request,Response,TextDecoder,Uint8Array,File,URL,atob,crypto,importMetaResolve:()=>'',Deno:{env:{get:name=>({SUPABASE_URL:'https://example.test',SUPABASE_SERVICE_ROLE_KEY:'test-server-only-key',ALLOWED_ORIGINS:'https://configured.example'}[name])},serve:value=>{configuredHandler=value;}}});
+ for(const origin of ['https://configured.example','https://o-benedito-demo-v4o6.onrender.com','https://www.obeneditogastropub.com.br','https://obeneditogastropub.com.br']){
+  const preflight=await configuredHandler(new Request('https://example.test/functions/v1/bene-admin',{method:'OPTIONS',headers:{origin}}));
+  assert.equal(preflight.status,204);assert.equal(preflight.headers.get('access-control-allow-origin'),origin);
  }
 });

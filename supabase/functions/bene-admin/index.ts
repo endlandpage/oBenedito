@@ -9,6 +9,8 @@ const db = createClient(url,key,{auth:{persistSession:false,autoRefreshToken:fal
 const PRIVATE='bene-gallery-private', PUBLIC='bene-gallery-public';
 const allowedOrigins=new Set((Deno.env.get('ALLOWED_ORIGINS')??'http://127.0.0.1:8766,http://localhost:8766,https://o-benedito.onrender.com').split(',').map(s=>s.trim()).filter(Boolean));
 allowedOrigins.add('https://o-benedito-demo-v4o6.onrender.com');
+allowedOrigins.add('https://www.obeneditogastropub.com.br');
+allowedOrigins.add('https://obeneditogastropub.com.br');
 const allowLocal=Deno.env.get('ALLOW_LOCALHOST')==='true';
 let wasmReady: Promise<void> | undefined;
 let processingImage=false;

@@ -6,7 +6,7 @@ const output = path.resolve(root, 'dist');
 if (path.dirname(output) !== path.resolve(root) || path.basename(output) !== 'dist') throw Error('Invalid output directory');
 if (fs.existsSync(output) && fs.lstatSync(output).isSymbolicLink()) throw Error('Output cannot be a symlink');
 const headers = require('./security-config.cjs');
-const blueprint = 'services:\n  - type: web\n    name: o-benedito-demo\n    runtime: static\n    repo: https://github.com/endlandpage/oBenedito\n    branch: main\n    buildCommand: node build-public.cjs\n    staticPublishPath: ./dist\n    autoDeployTrigger: commit\n    headers:\n' + Object.entries(headers).map(([name,value]) => `      - path: /*\n        name: ${name}\n        value: ${JSON.stringify(value)}\n`).join('');
+const blueprint = 'services:\n  - type: web\n    name: o-benedito-demo\n    runtime: static\n    repo: https://github.com/endlandpage/oBenedito\n    branch: main\n    buildCommand: node build-public.cjs\n    staticPublishPath: ./dist\n    autoDeployTrigger: commit\n    domains:\n      - www.obeneditogastropub.com.br\n    headers:\n' + Object.entries(headers).map(([name,value]) => `      - path: /*\n        name: ${name}\n        value: ${JSON.stringify(value)}\n`).join('');
 if (process.argv.includes('--write-blueprint')) fs.writeFileSync(path.join(root,'render.yaml'),blueprint);
 if (fs.readFileSync(path.join(root,'render.yaml'),'utf8').replace(/\r\n/g,'\n') !== blueprint) throw Error('Run node build-public.cjs --write-blueprint after changing security headers');
 // Only this validated build directory is removed. Source files are never deleted.

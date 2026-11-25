@@ -7,6 +7,8 @@ services:
     buildCommand: node build-public.cjs
     staticPublishPath: ./dist
     autoDeployTrigger: commit
+    domains:
+      - www.obeneditogastropub.com.br
     headers:
       - path: /*
         name: Content-Security-Policy
