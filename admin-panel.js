@@ -128,7 +128,7 @@
         if (api) accept(await api.save(revision,photos,siteSettings));
         else { localStorage.setItem(key,JSON.stringify({version:1,photos:seed.map(s => photos.find(p => p.id === s.id) || {id:s.id,deleted:true})})); dirty = false; }
         setBusy(false); $('save').disabled = true; $('save-state').textContent = api ? 'Salvo no armazenamento' : 'Salvo neste navegador'; render();
-        toast(api ? 'Galeria salva no ambiente de testes.' : 'Rascunho salvo neste navegador. O site não foi alterado.');
+        toast(api ? 'Galeria atualizada no site.' : 'Rascunho salvo neste navegador. O site não foi alterado.');
         if (api) window.dispatchEvent(new Event('bene:gallery-updated'));
       } catch (error) { setBusy(false); $('save').disabled = false; toast(error.message); }
     };
@@ -287,14 +287,14 @@
     root.querySelectorAll('[data-close]').forEach(b => b.onclick = () => { if (!busy) b.closest('dialog').close(); });
     window.addEventListener('beforeunload',e => { if (dirty || busy) { e.preventDefault(); e.returnValue = ''; } });
     if (api) {
-      const login = $('login'); login.querySelector('.badge').textContent = 'ADMINISTRAÇÃO / TESTES';
-      login.querySelector('.notice').textContent = 'Entre com a conta autorizada para administrar a galeria. Este é o ambiente de testes da Miralto.';
+      const login = $('login'); login.querySelector('.badge').textContent = 'ADMINISTRAÇÃO / O BENEDITO';
+      login.querySelector('.notice').textContent = 'Entre com a conta autorizada para administrar a galeria. As alterações salvas atualizam o site público do Bene.';
       for (const id of ['email','password']) { $(id).disabled = false; $(id).required = true; $(id).addEventListener('keydown',e => { if (e.key === 'Enter') { e.preventDefault(); $('explore').click(); } }); }
       $('email').placeholder = 'seu@email.com'; $('email').autocomplete = 'username';
       $('password').placeholder = 'Sua senha do painel'; $('password').autocomplete = 'current-password'; $('explore').textContent = 'Entrar no painel ↗';
-      $('exit').textContent = 'Sair do painel'; $('app').querySelector('.avatar small').textContent = 'Ambiente de testes';
-      $('app').querySelector('header .badge').textContent = 'TESTES MIRALTO';
-      $('app').querySelector('.notice>span').textContent = 'As alterações salvas são compartilhadas no ambiente de testes. Fotos publicadas ficam acessíveis por link.';
+      $('exit').textContent = 'Sair do painel'; $('app').querySelector('.avatar small').textContent = 'Site publicado';
+      $('app').querySelector('header .badge').textContent = 'SITE PUBLICADO';
+      $('app').querySelector('.notice>span').textContent = 'As alterações salvas atualizam o site público. Confira as fotos e a visibilidade antes de salvar.';
       $('save').textContent = 'Salvar galeria'; $('reset').textContent = 'Recarregar dados';
       $('upload').querySelector('.notice').textContent = 'Confira o recorte 4:5 de cada foto. Use “Ajustar enquadramento” para mover ou ampliar. O recorte será enviado, e as fotos entram ocultas até você salvar a visibilidade.';
       send.textContent = 'Enviar fotos'; $('upload').querySelector('.modal-footer [data-close]').textContent = 'Cancelar';
